@@ -37,15 +37,15 @@ export class AuthService {
   }
 
   async login(user: any): Promise<TokenResponseDto> {
-    
+    if (!user) {
+      throw new UnauthorizedException('Login failed: invalid user');
+    }
   
     const payload = { 
       sub: user.id,
       email: user.email,
       role: user.role,
     };
-  
-    console.log('JWT Payload:', payload);
   
     return {
       accessToken: this.jwtService.sign(payload),
@@ -59,6 +59,7 @@ export class AuthService {
       },
     };
   }
+  
   
   
 

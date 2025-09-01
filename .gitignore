@@ -3,3 +3,4 @@ dist/
 .env
 postgres_data/
 redis_data/
+.dockerignore
