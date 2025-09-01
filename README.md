@@ -97,50 +97,72 @@ npm run start:dev
 
 Access Swagger docs:``` http://localhost:3000/api```
 
-API Endpoints
-Users
-Method	Endpoint	Description	Roles
--POST	/users	Create a new user	Public
--GET	/users	List all users	Admin
--GET	/users/:id	Get user by ID	Admin
--PATCH	/users/:id/promote-to-admin	Promote user to admin	Admin
--PATCH	/users/:id/demote-to-user	Demote admin to user	Admin
-**Products**
-Method	Endpoint	Description	Roles
--POST	/products	Create a product	Admin
--PUT	/products/adjust	Adjust product stock/price	Admin
--GET	/status/:productId	Get product status	Public
--Transactions
--Method	Endpoint	Description	Roles
--GET	/transactions	List transactions (with filters & pagination)	Admin
+## 📌 API Endpoints
+
+---
+
+### 👤 Users
+| Method | Endpoint                              | Description           | Roles       |
+|--------|---------------------------------------|-----------------------|-------------|
+| GET    | `/users`                              | Get all users         | Admin only  |
+| GET    | `/users/{id}`                         | Get user by ID        | Admin only  |
+| PATCH  | `/users/{id}/promote-to-admin`        | Promote user to admin | Admin only  |
+| PATCH  | `/users/{id}/demote-to-user`          | Demote admin to user  | Admin only  |
+
+---
+
+### 🔑 Auth
+| Method | Endpoint          | Description        | Roles  |
+|--------|-------------------|--------------------|--------|
+| POST   | `/auth/register`  | Register a new user | Public |
+| POST   | `/auth/login`     | Login user          | Public |
+| GET    | `/auth/profile`   | Get user profile    | Authenticated users |
+
+---
+
+### 📦 Products
+| Method | Endpoint                         | Description                          | Roles       |
+|--------|----------------------------------|--------------------------------------|-------------|
+| POST   | `/products`                      | Create a new product                 | Admin only  |
+| GET    | `/products`                      | Get all active products              | Public      |
+| POST   | `/products/adjust`               | Adjust product quantity              | Admin only  |
+| GET    | `/products/{id}`                 | Get product by ID                    | Public      |
+| PATCH  | `/products/{id}`                 | Update product                       | Admin only  |
+| DELETE | `/products/{id}`                 | Delete product (soft delete)         | Admin only  |
+| GET    | `/products/status/{productId}`   | Get product status & stock info      | Public      |
+
+---
+
+### 💳 Transactions
+| Method | Endpoint                                | Description                                | Roles       |
+|--------|-----------------------------------------|--------------------------------------------|-------------|
+| POST   | `/transactions`                         | Create a new transaction                   | Auth users  |
+| GET    | `/transactions`                         | Get all transactions (with filters/pagination) | Admin only  |
+| GET    | `/transactions/{id}`                    | Get transaction by ID                      | Auth users  |
+| GET    | `/transactions/user/{userId}`           | Get transactions for a specific user       | Admin only  |
+| GET    | `/transactions/product/{productId}`     | Get transactions for a specific product    | Admin only  |
+| GET    | `/transactions/summary/overview`        | Get transaction summary overview           | Admin only  |
+| GET    | `/transactions/me/my-transactions`      | Get my own transactions                    | Auth users  |
 
 
 
-## Assumptions & Trade-offs
+## ⚖️ Assumptions & Trade-offs
 
--Default user role is user unless promoted.
+-  **Default Role**: Every new user is created as a **user** unless promoted to **admin**.  
+-  **Authorization**: Admin-only endpoints are protected via a **RolesGuard**.  
+-  **Authentication**: JWT token expiry is set to **1 hour**.  
+-  **Pagination**: Defaults to `page=1` and `limit=10`.  
+- **Validation & Errors**: DTO validation and structured error handling implemented for all endpoints.  
+- **Transactions**: Automatically created when product adjustments occur (could be refactored into a dedicated service layer for complex business logic).  
 
--Admin-only endpoints are protected using RolesGuard.
+---
 
--JWT token expiry: 1 hour.
+## 🚀 Future Optimizations
 
--Pagination defaults: page=1, limit=10.
-
--Error handling and DTO validation implemented for all endpoints.
-
--For simplicity, transactions are created automatically when products are adjusted (can be improved with a service layer for complex business logic).
-
-##Future Optimizations
-
-Caching: Use Redis to cache product data and frequently accessed queries to improve API response times.
-
-Pagination & Filtering Enhancements: Implement advanced filtering, sorting, and pagination for transactions and products.
-
-Background Jobs: Use a queue (e.g., Bull with Redis) for heavy operations like bulk updates or notifications.
-
-Rate Limiting & Security: Add rate limiting, request throttling, and enhanced validation for high traffic.
-
-Monitoring & Logging: Integrate centralized logging (Winston/ELK) and monitoring (Prometheus/Grafana) for production readiness.
-
-Unit & E2E Tests: Expand test coverage for edge cases and complex scenarios.
+- **Caching**: Integrate **Redis** to cache product data and frequently accessed queries, reducing API response times.  
+- **Pagination & Filtering Enhancements**: Add advanced filtering, sorting, and flexible pagination for transactions and products.  
+- **Background Jobs**: Use a queue system (e.g., **Bull + Redis**) for heavy tasks like bulk updates, report generation, or notifications.  
+- **Rate Limiting & Security**: Implement request throttling, rate limiting, and stricter input validation for high-traffic environments.  
+- **Monitoring & Logging**: Centralized logging with **Winston/ELK** and system monitoring using **Prometheus/Grafana** for production readiness.  
+- **Testing**: Increase unit and end-to-end (E2E) test coverage for edge cases and complex scenarios.  
 
