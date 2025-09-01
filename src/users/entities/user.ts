@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, OneToMany } from 'typeorm';
-// import { Transaction } from '../../transactions/entities/transaction';
+import { Transaction } from '../../transactions/entities/transaction';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { UserRole } from '../enums/user-role';
@@ -34,6 +34,6 @@ export class User {
   @CreateDateColumn()
   createdAt: Date;
 
-//   @OneToMany(() => Transaction, transaction => transaction.user)
-//   transactions: Transaction[];
+  @OneToMany(() => Transaction, transaction => transaction.user)
+  transactions: Transaction[];
 }

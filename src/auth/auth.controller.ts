@@ -6,6 +6,7 @@ import { TokenResponseDto } from './dto/token-response.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -28,11 +29,12 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Login successful', type: TokenResponseDto })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @ApiBody({ type: LoginDto })
-  async login(@Request() LoginDto): Promise<TokenResponseDto> {
-    return this.authService.login(LoginDto);
+  async login(@Request() req): Promise<TokenResponseDto> {
+    return this.authService.login(req.user);
   }
+  
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard )
   @Get('profile')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get user profile' })

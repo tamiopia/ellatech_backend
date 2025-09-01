@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, ForbiddenException } from '@nestjs/common';
+import { Injectable, ConflictException, ForbiddenException ,NotFoundException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -68,5 +68,13 @@ export class UsersService {
   async isAdmin(userId: number): Promise<boolean> {
     const user = await this.findOne(userId);
     return user?.role === UserRole.ADMIN;
+  }
+
+  async findById(id: number): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
   }
 }

@@ -5,25 +5,21 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user';
 import { UserRole } from './enums/user-role';
 import { Roles } from '../common/decorators/roles.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 
 @ApiTags('users')
+@Roles(UserRole.ADMIN)
 @Controller('users')
-@UseGuards(RolesGuard)
+@UseGuards(JwtAuthGuard,RolesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({ status: 201, description: 'User created successfully', type: User })
-  @ApiResponse({ status: 409, description: 'Email already exists' })
-  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.usersService.create(createUserDto);
-  }
 
   @Get()
+  
   @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all users (Admin only)' })
   @ApiResponse({ status: 200, description: 'List of users', type: [User] })
@@ -34,6 +30,7 @@ export class UsersController {
 
   @Get(':id')
   @Roles(UserRole.ADMIN)
+ @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get user by ID (Admin only)' })
   @ApiResponse({ status: 200, description: 'User found', type: User })

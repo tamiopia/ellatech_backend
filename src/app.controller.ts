@@ -7,7 +7,7 @@ export class AppController {
   @ApiOperation({ summary: 'Welcome endpoint' })
   @ApiResponse({ status: 200, description: 'Welcome message' })
   getHello(): string {
-    return 'Ellatech Backend Service (NestJS v11) is running!';
+    return 'hello the Backend Service  is running well !';
   }
 
   @Get('health')

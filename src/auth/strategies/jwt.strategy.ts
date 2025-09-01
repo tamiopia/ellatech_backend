@@ -7,8 +7,8 @@ import { UsersService } from '../../users/users.service';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private configService: ConfigService,
-    private usersService: UsersService,
+    private readonly configService: ConfigService,
+    private readonly usersService: UsersService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -18,10 +18,26 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    const user = await this.usersService.findOne(payload.sub);
-    if (!user) {
-      throw new UnauthorizedException('User not found');
+    // ✅ Adjust here depending on your JWT payload structure
+    const userId = payload.sub; // usually "sub" contains the user id
+    const userEmail = payload.email; // sometimes you also have email in the payload
+
+    let user = null;
+    if (userId) {
+      user = await this.usersService.findById(userId);
+    } else if (userEmail) {
+      user = await this.usersService.findByEmail(userEmail);
     }
-    return user;
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid token or user not found');
+    }
+
+    // ✅ Return only safe user data (not password, etc.)
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    };
   }
 }

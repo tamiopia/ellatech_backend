@@ -37,17 +37,19 @@ export class AuthService {
   }
 
   async login(user: any): Promise<TokenResponseDto> {
-    console.log('Login attempt:', user.email); // Debug log
+    
   
     const payload = { 
-      email: user.email, 
       sub: user.id,
-      role: user.role 
+      email: user.email,
+      role: user.role,
     };
+  
+    console.log('JWT Payload:', payload);
   
     return {
       accessToken: this.jwtService.sign(payload),
-      expiresIn: 3600, // 1 hour
+      expiresIn: 3600,
       tokenType: 'Bearer',
       user: {
         id: user.id,
@@ -58,9 +60,10 @@ export class AuthService {
     };
   }
   
+  
 
   async register(createUserDto: CreateUserDto): Promise<TokenResponseDto> {
-    console.log('Registering user:', createUserDto.email); // Debug log
+   
     
     const user = await this.usersService.create(createUserDto);
     const { password: _, ...userWithoutPassword } = user;
@@ -85,6 +88,8 @@ export class AuthService {
   }
 
   async getProfile(userId: number): Promise<any> {
+
+    console.log('user id',userId)
     const user = await this.usersService.findOne(userId);
     if (!user) {
       throw new UnauthorizedException('User not found');

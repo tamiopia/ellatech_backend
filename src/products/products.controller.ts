@@ -8,10 +8,11 @@ import { ProductStatusDto } from './dto/product-status.dto';
 import { UserRole } from '../users/enums/user-role';
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
 
 @ApiTags('products')
 @Controller('products')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard ,RolesGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 

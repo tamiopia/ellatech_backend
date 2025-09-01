@@ -6,10 +6,12 @@ import { TransactionResponseDto } from './dto/transaction-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../users/enums/user-role';
+import { RolesGuard } from '../common/guards/roles.guard';
+
 
 @ApiTags('transactions')
 @Controller('transactions')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard ,RolesGuard)
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
@@ -29,28 +31,37 @@ export class TransactionsController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN)             
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get all transactions with pagination and filtering(Admin only)' })
+  @ApiOperation({ summary: 'Get all transactions with pagination and filtering (Admin only)' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'userId', required: false, type: Number })
   @ApiQuery({ name: 'productId', required: false, type: Number })
   @ApiQuery({ name: 'type', required: false, type: String })
-  @ApiQuery({ name: 'startDate', required: false, type: Date })
-  @ApiQuery({ name: 'endDate', required: false, type: Date })
+  @ApiQuery({ name: 'startDate', required: false, type: String, description: 'ISO date string (YYYY-MM-DD)' })
+  @ApiQuery({ name: 'endDate', required: false, type: String, description: 'ISO date string (YYYY-MM-DD)' })
   @ApiResponse({ status: 200, description: 'List of transactions', type: [TransactionResponseDto] })
   async findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
     @Query('userId') userId?: number,
     @Query('productId') productId?: number,
     @Query('type') type?: string,
-    @Query('startDate') startDate?: Date,
-    @Query('endDate') endDate?: Date,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
   ) {
-    return this.transactionsService.findAll(page, limit, userId, productId, type, startDate, endDate);
+    return this.transactionsService.findAll(
+      page,
+      limit,
+      userId,
+      productId,
+      type,
+      startDate ? new Date(startDate) : undefined,
+      endDate ? new Date(endDate) : undefined,
+    );
   }
 
   @Get(':id')
@@ -100,7 +111,7 @@ export class TransactionsController {
     return this.transactionsService.getTransactionSummary();
   }
 
-  
+
   @Get('me/my-transactions')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get my own transactions' })
