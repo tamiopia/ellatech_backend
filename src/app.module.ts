@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { ProductsModule } from './products/products.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -16,6 +19,9 @@ import { UsersModule } from './users/users.module';
       synchronize: true, // true for development, false for production with migrations
     }),
     UsersModule,
+    AuthModule,
+    ProductsModule,
+    TransactionsModule,
   ],
   controllers: [AppController],
 })
