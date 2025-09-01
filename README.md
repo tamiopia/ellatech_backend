@@ -65,7 +65,8 @@ JWT_SECRET=your-secret-key
 Docker
 
 Run API and DB locally:
-```docker-compose up --build
+```
+docker-compose up --build
 ```
 This will start:
 
